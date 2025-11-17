@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Correct Firebase reference
         wordsRef = FirebaseDatabase.getInstance().getReference("words");
 
         statusText = findViewById(R.id.status_text);
@@ -97,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         guessInput.getText().clear();
+        statusText.setText("Guess the word!");
     }
 
     private void loadRandomWord() {
@@ -112,19 +112,15 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Word w = child.getValue(Word.class);
-
-                    // Safety check
                     if (w != null && w.getText() != null && w.getText().length() == 5) {
                         wordList.add(w.getText());
                     }
                 }
 
                 if (wordList.isEmpty()) {
-                    // Fallback word
                     targetWord = "apple";
                     statusText.setText("Using fallback: APPLE (DB empty)");
                 } else {
-                    // Random choice
                     targetWord = wordList.get(new Random().nextInt(wordList.size()));
                     statusText.setText("Guess the word!");
                 }
@@ -149,31 +145,66 @@ public class MainActivity extends AppCompatActivity {
         String guess = guessInput.getText().toString().trim().toLowerCase();
 
         if (guess.length() != 5) {
-            Toast.makeText(this, "Enter exactly 5 letters.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter EXACTLY 5 letters.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Update grid display
         for (int i = 0; i < 5; i++) {
-            grid[currentRow][i].setText(String.valueOf(guess.charAt(i)).toUpperCase());
+            grid[currentRow][i].setText(String.valueOf(Character.toUpperCase(guess.charAt(i))));
         }
 
-        // Win condition
+        char[] answerArray = targetWord.toCharArray();
+        char[] guessArray = guess.toCharArray();
+        int[] color = new int[5];  // 0 = gray, 1 = yellow, 2 = green
+        boolean[] used = new boolean[5]; // which answer letters were "used"
+
+        for (int i = 0; i < 5; i++) {
+            if (guessArray[i] == answerArray[i]) {
+                color[i] = 2;
+                used[i] = true;
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (color[i] == 0) { // only if not already green
+                for (int j = 0; j < 5; j++) {
+                    if (!used[j] && guessArray[i] == answerArray[j]) {
+                        color[i] = 1;
+                        used[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (color[i] == 2) {
+                grid[currentRow][i].setBackgroundResource(R.drawable.cell_background_correct);
+            } else if (color[i] == 1) {
+                grid[currentRow][i].setBackgroundResource(R.drawable.cell_background_present);
+            } else {
+                grid[currentRow][i].setBackgroundResource(R.drawable.cell_background_neutral);
+            }
+        }
+
+        // WIN
         if (guess.equals(targetWord)) {
-            statusText.setText("You WIN! Word was: " + targetWord.toUpperCase());
+            statusText.setText("You WIN! Word: " + targetWord.toUpperCase());
             gameOver = true;
             return;
         }
 
-        // Loss condition
+        // LOSS
         if (currentRow == 5) {
-            statusText.setText("You LOST! Word was: " + targetWord.toUpperCase());
+            statusText.setText("You LOST! Word: " + targetWord.toUpperCase());
             gameOver = true;
             return;
         }
 
+        // Continue game
         currentRow++;
         statusText.setText("Guess " + (currentRow + 1) + " of 6");
         guessInput.getText().clear();
     }
+
 }
