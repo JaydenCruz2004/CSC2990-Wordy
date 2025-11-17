@@ -116,10 +116,10 @@ public class MainActivity extends AppCompatActivity {
                         wordList.add(w.getText());
                     }
                 }
-
+//doggy not in db but hardcoded until a word is added to the db
                 if (wordList.isEmpty()) {
-                    targetWord = "apple";
-                    statusText.setText("Using fallback: APPLE (DB empty)");
+                    targetWord = "doggy";
+                    statusText.setText("Using fallback: DOGGY (DB empty click Add Word)");
                 } else {
                     targetWord = wordList.get(new Random().nextInt(wordList.size()));
                     statusText.setText("Guess the word!");
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 statusText.setText("Firebase error — using fallback word.");
-                targetWord = "apple";
+                targetWord = "doggy";
                 submitButton.setEnabled(true);
                 gameOver = false;
             }
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         for (int i = 0; i < 5; i++) {
-            if (color[i] == 0) { // only if not already green
+            if (color[i] == 0) {
                 for (int j = 0; j < 5; j++) {
                     if (!used[j] && guessArray[i] == answerArray[j]) {
                         color[i] = 1;

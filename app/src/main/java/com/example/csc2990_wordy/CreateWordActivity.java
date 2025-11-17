@@ -12,9 +12,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.csc2990_wordy.Word;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class CreateWordActivity extends AppCompatActivity {
 
@@ -24,6 +26,8 @@ public class CreateWordActivity extends AppCompatActivity {
     private TextView wordLabel;
     private Button addButton;
     private Button cancelButton;
+    private Button clearButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,6 @@ public class CreateWordActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_create_word);
 
-        // Correct database reference
         wordsRef = FirebaseDatabase
                 .getInstance()
                 .getReference("words");
@@ -40,6 +43,8 @@ public class CreateWordActivity extends AppCompatActivity {
         wordLabel = findViewById(R.id.word_label);
         addButton = findViewById(R.id.add_button);
         cancelButton = findViewById(R.id.cancel_button);
+        clearButton = findViewById(R.id.clear_database_button);
+
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,45 +59,87 @@ public class CreateWordActivity extends AppCompatActivity {
                 attemptAddWord();
             }
         });
+
+        clearButton = findViewById(R.id.clear_database_button);
+
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearDatabase();
+            }
+        });
+
     }
 
     private void attemptAddWord() {
 
         wordLabel.setTextColor(Color.BLACK);
+
         String input = wordInput.getText().toString().trim();
 
-        // validation
         if (input.isEmpty()) {
-            Toast.makeText(this, "Word cannot be empty", Toast.LENGTH_LONG).show();
-            wordLabel.setTextColor(Color.parseColor("#800080"));
+            showError("Word cannot be empty");
             return;
         }
         if (input.length() != 5) {
-            Toast.makeText(this, "Word must be exactly 5 letters", Toast.LENGTH_LONG).show();
-            wordLabel.setTextColor(Color.parseColor("#800080"));
+            showError("Word must be exactly 5 letters");
             return;
         }
         if (!input.matches("[a-zA-Z]+")) {
-            Toast.makeText(this, "Letters only", Toast.LENGTH_LONG).show();
-            wordLabel.setTextColor(Color.parseColor("#800080"));
+            showError("Letters only");
             return;
         }
 
         final String newWord = input.toLowerCase();
 
-        // WRITE CORRECT WAY — MUST USE Word OBJECT
+        wordsRef.orderByChild("text")
+                .equalTo(newWord)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            showError("That word is already in the word bank");
+                        } else {
+                            addWordToFirebase(newWord);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        showError("Error checking duplicates: " + error.getMessage());
+                    }
+                });
+    }
+
+    private void addWordToFirebase(String newWord) {
         wordsRef.push()
                 .setValue(new Word(newWord))
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(CreateWordActivity.this,
-                            "Word added!",
+                            "Word stored in database!",
                             Toast.LENGTH_SHORT).show();
                     finish();
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(CreateWordActivity.this,
-                                "Write failed: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show()
-                );
+                .addOnFailureListener(e -> showError("Write failed: " + e.getMessage()));
     }
+
+    private void showError(String message) {
+        wordLabel.setTextColor(Color.parseColor("#800080"));
+        Toast.makeText(CreateWordActivity.this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void clearDatabase() {
+        wordsRef.removeValue()
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(CreateWordActivity.this,
+                            "Word bank cleared!",
+                            Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(CreateWordActivity.this,
+                            "Failed to clear database: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+
 }

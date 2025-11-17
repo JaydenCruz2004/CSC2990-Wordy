@@ -2,7 +2,7 @@ package com.example.csc2990_wordy;
 
 public class Word {
 
-    public String text;  // must be PUBLIC for Firebase
+    public String text;
 
     public Word() { }
 

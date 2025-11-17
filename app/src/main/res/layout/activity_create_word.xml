@@ -35,14 +35,6 @@
             android:layout_weight="1"
             android:text="@string/add"/>
 
-        <Button
-            android:id="@+id/clear_database_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_database"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#AA0000"
-            android:textColor="@android:color/white"/>
 
 
         <Button
@@ -52,6 +44,15 @@
             android:layout_weight="1"
             android:text="@string/cancel"
             android:layout_marginStart="8dp"/>
+
+        <Button
+            android:id="@+id/clear_database_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_database"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#AA0000"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 
 
