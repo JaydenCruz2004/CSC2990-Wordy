@@ -1,4 +1,6 @@
 # Wordy – Android Wordle Clone
+![Wordy App Logo](app/src/main/ic_launcher-playstore.png)
+
 
 Android app for **CSC 2990 – Assignment 4**.  
 Wordy is a simple Wordle-style game where the user has six tries to guess a secret **five-letter word** that is stored in **Firebase Realtime Database**.
