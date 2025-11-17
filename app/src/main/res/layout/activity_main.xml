@@ -12,7 +12,7 @@
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WORDY"
+        android:text="@string/wordy"
         android:textStyle="bold"
         android:textSize="28sp"
         android:layout_marginBottom="12dp"
@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="Guess the word!"
+        android:text="@string/guess_the_word"
         android:textSize="18sp" />
 
     <LinearLayout
@@ -60,7 +60,7 @@
         android:id="@+id/guess_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter a 5-letter word"
+        android:hint="@string/enter_a_5_letter_word"
         android:maxLength="5"
         android:inputType="textCapCharacters"
         android:layout_marginTop="16dp"/>
@@ -76,27 +76,27 @@
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit"/>
+            android:text="@string/submit"/>
 
         <Button
             android:id="@+id/restart_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Restart"
+            android:text="@string/restart"
             android:layout_marginStart="8dp"/>
 
         <Button
             android:id="@+id/clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear"
+            android:text="@string/clear"
             android:layout_marginStart="8dp"/>
 
         <Button
             android:id="@+id/add_word_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Word"
+            android:text="@string/add_word"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
